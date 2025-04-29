@@ -1,5 +1,4 @@
 <?php
+use App\Http\Controllers\CustomerOrderController;
 
-use App\Http\Controllers\FoodController;
-
-Route::apiResource('foods', FoodController::class);
+Route::get('/customer-orders', [CustomerOrderController::class, 'apiSearch']);
