@@ -1,4 +1,89 @@
 <?php
-use App\Http\Controllers\CustomerOrderController;
+use App\Http\Controllers\TableController;
+use App\Http\Controllers\FoodController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\OrderDetailController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\IngredientController;
+use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\WasteController;
+use App\Http\Controllers\InventoryStatsController;
 
-Route::get('/customer-orders', [CustomerOrderController::class, 'apiSearch']);
+// Nguyên liệu
+Route::apiResource('ingredients', IngredientController::class);
+Route::get('ingredients-by-category/{id}', [IngredientController::class, 'byCategory']);
+
+// Nhập kho
+Route::apiResource('inventory-receipts', InventoryController::class);
+Route::get('inventory-receipts-by-date', [InventoryController::class, 'getByDate']);
+
+// Tiêu hủy (Xuất kho)
+Route::apiResource('inventory-waste', WasteController::class);
+Route::get('destructions-by-date', [WasteController::class, 'getByDate']); // ✅ MỚI
+
+// Thống kê nhập
+Route::get('reports/daily', [InventoryStatsController::class, 'daily']);
+Route::get('reports/monthly', [InventoryStatsController::class, 'monthly']);
+Route::get('reports/yearly', [InventoryStatsController::class, 'yearly']);
+
+// Thống kê tiêu hủy ✅ MỚI
+Route::get('reports/destruction/daily', [InventoryStatsController::class, 'destructionDaily']);
+Route::get('reports/destruction/monthly', [InventoryStatsController::class, 'destructionMonthly']);
+Route::get('reports/destruction/yearly', [InventoryStatsController::class, 'destructionYearly']);
+
+
+
+Route::resource('ingredients', IngredientController::class); // Đảm bảo đã có API cho ingredients
+
+
+Route::prefix('dashboard')->group(function () {
+    // Food
+    Route::get('/foods', [DashboardController::class, 'getFoods']);
+    Route::post('/foods', [DashboardController::class, 'createFood']);
+    Route::put('/dashboard/foods/{id}', [DashboardController::class, 'updateFood']);
+    Route::patch('/foods/{id}/toggle', [DashboardController::class, 'toggleFoodStatus']);
+
+    // Category
+    Route::get('/categories', [DashboardController::class, 'getCategories']);
+    Route::post('/categories', [DashboardController::class, 'createCategory']);
+    Route::post('/categories/{id}', [DashboardController::class, 'updateCategory']);
+    Route::patch('/categories/{id}/toggle', [DashboardController::class, 'toggleCategoryStatus']);
+
+    // User (Employee)
+    Route::get('/users', [DashboardController::class, 'getUsers']);
+    Route::post('/users', [DashboardController::class, 'createUser']);
+    Route::post('/users/{id}', [DashboardController::class, 'updateUser']);
+    Route::patch('/users/{id}/toggle', [DashboardController::class, 'toggleUserStatus']);
+    Route::get('/dashboard/roles', function () {
+        return \App\Models\Role::all();
+    });
+
+});
+
+
+
+Route::put('orders/change-table', [OrderController::class, 'changeTable']);
+Route::get('/tables/available', [TableController::class, 'getAvailableTables']);
+
+Route::patch('/order-details/{id}/kitchen-status', [OrderDetailController::class, 'updateStatus']);
+Route::get('/tables/{id}', [TableController::class, 'show']);
+Route::get('/orders/latest/{tableId}', [OrderController::class, 'latestOrder']);
+Route::get('/orders/pending', [OrderDetailController::class, 'getPendingOrders']);
+Route::post('/orders/complete/{id}', [OrderDetailController::class, 'completeItem']);
+Route::patch('/order-details/{id}/toggle-served', [OrderDetailController::class, 'toggleServed']);
+Route::get('/orders/latest/{table_id}', [OrderController::class, 'getLatestByTable']);
+Route::get('/orders', [OrderController::class, 'getOrdersByTable']);
+Route::post('/orders', [OrderController::class, 'store']);
+Route::get('/categories', [CategoryController::class, 'index']);
+Route::get('/foods/category-name/{categoryName}', [FoodController::class, 'getFoodsByCategoryName']);
+Route::get('/foods', [FoodController::class, 'index']);
+Route::get('/tables', [TableController::class, 'index']);
+Route::put('/tables/{id}', [TableController::class, 'update']); // thêm route update
+Route::get('/orders/by-table', [OrderController::class, 'getOrdersByTable']);
+Route::get('/orders/by-table/{table_id}', [OrderController::class, 'showByTable']);
+Route::post('/orders/update-table-status/{tableId}', [OrderController::class, 'updateTableStatusBasedOnOrder']);
+Route::patch('/order-details/{id}/accept', [OrderDetailController::class, 'accept']);
+Route::post('/orders/startcooking/{id}', [OrderDetailController::class, 'startCooking']);
+Route::delete('/order-details/{id}', [OrderDetailController::class, 'destroy']);
+Route::get('/order-details/pending-ready', [OrderDetailController::class, 'getPendingReady']);

@@ -16,7 +16,7 @@ class CreateTablesTable extends Migration
             $table->string('table_number');
             $table->string('capacity');
             $table->string('guess_count');
-            $table->enum('status', ['trống','đang order','đã gửi bếp','chờ lên món','đã lên món', 'chờ thanh toán'])->default('trống');
+            $table->enum('status', ['trống','đang order','đã gửi bếp','chờ lên món','đã lên hết món', 'chờ thanh toán'])->default('trống');
 
             $table->timestamps();
         });
