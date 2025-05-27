@@ -16,14 +16,14 @@ return new class extends Migration
             $table->string('name');
             $table->string('phone');
             $table->dateTime('date');
+            $table->unsignedBigInteger('id_food');
             $table->decimal('pre_order_price',10,0);
-            $table->unsignedBigInteger('table_id');
             $table->unsignedBigInteger('id_promotion');
             $table->unsignedBigInteger('id_area');
             $table->foreign('id_area')->references('id')->on('areas');
             $table->integer('guest_count')->default(1);
             $table->foreign('id_promotion')->references('id')->on('promotions');
-            $table->foreign('table_id')->references('id')->on('tables');
+            $table->foreign('id_food')->references('id')->on('foods');
             $table->timestamps();
         });
     }
